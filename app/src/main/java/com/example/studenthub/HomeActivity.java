@@ -2,8 +2,6 @@ package com.example.studenthub;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,12 +12,10 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.textfield.TextInputEditText;
 
 public class HomeActivity extends AppCompatActivity {
 
     private SessionManager sessionManager;
-    private DatabaseHelper databaseHelper;
     private TextView tvWelcome;
 
     @Override
@@ -27,7 +23,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         sessionManager = new SessionManager(this);
-        databaseHelper = new DatabaseHelper(this);
 
         // Apply theme
         if (sessionManager.isDarkMode()) {
@@ -49,20 +44,17 @@ public class HomeActivity extends AppCompatActivity {
 
         updateUI();
 
-        // Avatar click -> Profile
-        ivProfileAvatar.setOnClickListener(v -> showEditProfileDialog());
+        // Avatar click -> ProfileActivity
+        ivProfileAvatar.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
 
-        // Card 1: Profile
-        cardProfile.setOnClickListener(v -> showEditProfileDialog());
+        // Card 1: Profile -> ProfileActivity
+        cardProfile.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
 
-        // Card 2: Users
-        cardUsers.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, UserListActivity.class);
-            startActivity(intent);
-        });
+        // Card 2: Users -> UserListActivity
+        cardUsers.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, UserListActivity.class)));
 
-        // Card 3: Security (Change password)
-        cardSecurity.setOnClickListener(v -> showChangePasswordDialog());
+        // Card 3: Security -> ProfileActivity (Password management is inside Profile)
+        cardSecurity.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
 
         // Card 4: Settings (Toggle Dark Mode)
         cardSettings.setOnClickListener(v -> {
@@ -89,14 +81,26 @@ public class HomeActivity extends AppCompatActivity {
                 // Already on home dashboard
                 return true;
             } else if (id == R.id.nav_users) {
-                startActivity(new Intent(HomeActivity.this, UserListActivity.class));
+                Intent intent = new Intent(HomeActivity.this, UserListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                finish();
                 return true;
             } else if (id == R.id.nav_profile) {
-                showEditProfileDialog();
+                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                finish();
                 return true;
             }
             return false;
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUI();
     }
 
     private void updateUI() {
@@ -106,80 +110,6 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             tvWelcome.setText("Bienvenue !");
         }
-    }
-
-    private void showEditProfileDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_edit_profile, null);
-        builder.setView(dialogView);
-
-        TextInputEditText etNom = dialogView.findViewById(R.id.etEditNom);
-        TextInputEditText etPrenom = dialogView.findViewById(R.id.etEditPrenom);
-
-        etNom.setText(sessionManager.getNom());
-        etPrenom.setText(sessionManager.getPrenom());
-
-        builder.setTitle("Modifier mon profil")
-                .setPositiveButton("Enregistrer", (dialog, which) -> {
-                    String newNom = etNom.getText() != null ? etNom.getText().toString().trim() : "";
-                    String newPrenom = etPrenom.getText() != null ? etPrenom.getText().toString().trim() : "";
-
-                    if (newNom.isEmpty() || newPrenom.isEmpty()) {
-                        Toast.makeText(this, "Le nom et le prénom ne peuvent pas être vides.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    int userId = sessionManager.getUserId();
-                    boolean success = databaseHelper.updateUserProfile(userId, newNom, newPrenom);
-                    if (success) {
-                        sessionManager.updateUserInfo(newNom, newPrenom);
-                        updateUI();
-                        Toast.makeText(this, "Profil mis à jour avec succès.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Erreur lors de la mise à jour du profil.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Annuler", (dialog, which) -> dialog.dismiss());
-
-        builder.create().show();
-    }
-
-    private void showChangePasswordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_change_password, null);
-        builder.setView(dialogView);
-
-        TextInputEditText etNewPassword = dialogView.findViewById(R.id.etNewPassword);
-        TextInputEditText etConfirmPassword = dialogView.findViewById(R.id.etConfirmPassword);
-
-        builder.setTitle("Changer le mot de passe")
-                .setPositiveButton("Modifier", (dialog, which) -> {
-                    String newPass = etNewPassword.getText() != null ? etNewPassword.getText().toString().trim() : "";
-                    String confirmPass = etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString().trim() : "";
-
-                    if (newPass.isEmpty() || confirmPass.isEmpty()) {
-                        Toast.makeText(this, "Veuillez remplir tous les champs.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    if (!newPass.equals(confirmPass)) {
-                        Toast.makeText(this, "Les mots de passe ne correspondent pas.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    int userId = sessionManager.getUserId();
-                    boolean success = databaseHelper.updateUserPassword(userId, newPass);
-                    if (success) {
-                        Toast.makeText(this, "Mot de passe modifié avec succès.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Erreur lors de la modification du mot de passe.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Annuler", (dialog, which) -> dialog.dismiss());
-
-        builder.create().show();
     }
 
     private void showLogoutConfirmationDialog() {

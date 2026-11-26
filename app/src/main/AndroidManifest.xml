@@ -33,6 +33,16 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".SecurityActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".UserListActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

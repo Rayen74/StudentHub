@@ -5,21 +5,22 @@ public class User {
     private String nom;
     private String prenom;
     private String email;
-    private String password;
+    private String createdAt;
 
-    public User(int id, String nom, String prenom, String email, String password) {
+    public User(int id, String nom, String prenom, String email, String createdAt) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
-        this.password = password;
+        this.createdAt = createdAt;
     }
 
-    public User(String nom, String prenom, String email, String password) {
+    public User(int id, String nom, String prenom, String email) {
+        this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
-        this.password = password;
+        this.createdAt = "";
     }
 
     public int getId() {
@@ -54,11 +55,11 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }

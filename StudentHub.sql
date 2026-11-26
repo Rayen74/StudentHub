@@ -1,5 +1,5 @@
 -- =====================================================================
--- StudentHub SQLite Initialization Script
+-- StudentHub SQLite Initialization Script (Updated with password_hash)
 -- =====================================================================
 
 -- Enable foreign key support
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     nom TEXT NOT NULL,
     prenom TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
