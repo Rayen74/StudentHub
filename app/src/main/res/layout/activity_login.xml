@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="StudentHub"
+            android:text="@string/login_title"
             android:textSize="30sp"
             android:textStyle="bold"
             android:textColor="@color/primary"
@@ -38,7 +38,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Votre espace académique intelligent"
+            android:text="@string/login_subtitle"
             android:textSize="14sp"
             android:textColor="@color/text_secondary"
             android:layout_marginBottom="32dp" />
@@ -74,7 +74,7 @@
                     app:hintTextColor="@color/primary"
                     app:startIconDrawable="@drawable/ic_profile"
                     app:startIconTint="@color/primary"
-                    android:hint="Adresse e-mail">
+                    android:hint="@string/login_email_hint">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etLoginEmail"
@@ -101,7 +101,7 @@
                     app:startIconDrawable="@drawable/ic_lock"
                     app:startIconTint="@color/primary"
                     app:endIconMode="password_toggle"
-                    android:hint="Mot de passe">
+                    android:hint="@string/login_password_hint">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etLoginPassword"
@@ -121,7 +121,7 @@
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Se connecter"
+            android:text="@string/login_button"
             android:textSize="16sp"
             android:textStyle="bold"
             app:cornerRadius="14dp"
@@ -134,7 +134,7 @@
             android:id="@+id/tvGoToRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Vous n'avez pas de compte ? Créer un compte"
+            android:text="@string/go_to_register_link"
             android:textColor="@color/primary"
             android:textSize="14sp"
             android:textStyle="bold"

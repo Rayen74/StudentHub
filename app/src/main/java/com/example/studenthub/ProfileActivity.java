@@ -153,10 +153,10 @@ public class ProfileActivity extends AppCompatActivity {
         etProfilePrenom.setEnabled(enabled);
 
         if (enabled) {
-            btnEditSaveProfile.setText("Enregistrer les modifications");
+            btnEditSaveProfile.setText(getString(R.string.profile_save_changes_button));
             btnCancelEdit.setVisibility(View.VISIBLE);
         } else {
-            btnEditSaveProfile.setText("Modifier le profil");
+            btnEditSaveProfile.setText(getString(R.string.profile_edit_button));
             btnCancelEdit.setVisibility(View.GONE);
         }
     }
@@ -166,7 +166,7 @@ public class ProfileActivity extends AppCompatActivity {
         String newPrenom = etProfilePrenom.getText() != null ? etProfilePrenom.getText().toString().trim() : "";
 
         if (newNom.isEmpty() || newPrenom.isEmpty()) {
-            Toast.makeText(this, "Le nom et le prénom ne peuvent pas être vides.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.profile_empty_names_error), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -176,11 +176,11 @@ public class ProfileActivity extends AppCompatActivity {
             mainHandler.post(() -> {
                 if (success) {
                     sessionManager.updateUserInfo(newNom, newPrenom);
-                    Toast.makeText(this, "Profil mis à jour avec succès.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.profile_update_success), Toast.LENGTH_SHORT).show();
                     loadProfileData();
                     setEditingMode(false);
                 } else {
-                    Toast.makeText(this, "Erreur lors de la mise à jour du profil.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.profile_update_error), Toast.LENGTH_SHORT).show();
                 }
             });
         });

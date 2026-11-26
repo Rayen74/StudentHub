@@ -82,42 +82,41 @@ public class SecurityActivity extends AppCompatActivity {
     }
 
     private void handlePasswordUpdate() {
-        // Do NOT trim passwords (preserve exact password entered)
         String currentPass = etCurrentPassword.getText() != null ? etCurrentPassword.getText().toString() : "";
         String newPass = etNewPassword.getText() != null ? etNewPassword.getText().toString() : "";
         String confirmPass = etConfirmNewPassword.getText() != null ? etConfirmNewPassword.getText().toString() : "";
 
         if (currentPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
-            Toast.makeText(this, "Veuillez remplir tous les champs.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.register_required_fields), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (newPass.length() < 6) {
-            Toast.makeText(this, "Le nouveau mot de passe doit contenir au moins 6 caractères.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.password_too_short), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (!newPass.equals(confirmPass)) {
-            Toast.makeText(this, "Les nouveaux mots de passe ne correspondent pas.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.password_mismatch), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (newPass.equals(currentPass)) {
-            Toast.makeText(this, "Le nouveau mot de passe doit être différent de l'actuel.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.password_same_as_current), Toast.LENGTH_SHORT).show();
             return;
         }
 
         btnUpdatePassword.setEnabled(false);
-        btnUpdatePassword.setText("Mise à jour...");
+        btnUpdatePassword.setText(getString(R.string.loading));
 
         int userId = sessionManager.getUserId();
         executorService.execute(() -> {
             boolean isCurrentValid = databaseHelper.verifyCurrentPassword(userId, currentPass);
             if (!isCurrentValid) {
                 mainHandler.post(() -> {
-                    Toast.makeText(SecurityActivity.this, "Le mot de passe actuel est incorrect.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SecurityActivity.this, getString(R.string.password_current_incorrect), Toast.LENGTH_SHORT).show();
                     btnUpdatePassword.setEnabled(true);
-                    btnUpdatePassword.setText("Mettre à jour le mot de passe");
+                    btnUpdatePassword.setText(getString(R.string.update_password_button));
                 });
                 return;
             }
@@ -125,12 +124,12 @@ public class SecurityActivity extends AppCompatActivity {
             boolean success = databaseHelper.updateUserPassword(userId, newPass);
             mainHandler.post(() -> {
                 if (success) {
-                    Toast.makeText(SecurityActivity.this, "Mot de passe mis à jour avec succès.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SecurityActivity.this, getString(R.string.password_updated_successfully), Toast.LENGTH_LONG).show();
                     finish();
                 } else {
-                    Toast.makeText(SecurityActivity.this, "Erreur lors de la mise à jour du mot de passe.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SecurityActivity.this, getString(R.string.password_update_error), Toast.LENGTH_SHORT).show();
                     btnUpdatePassword.setEnabled(true);
-                    btnUpdatePassword.setText("Mettre à jour le mot de passe");
+                    btnUpdatePassword.setText(getString(R.string.update_password_button));
                 }
             });
         });

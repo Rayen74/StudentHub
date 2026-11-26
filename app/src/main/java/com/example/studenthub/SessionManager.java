@@ -11,6 +11,7 @@ public class SessionManager {
     private static final String KEY_PRENOM = "UserPrenom";
     private static final String KEY_EMAIL = "UserEmail";
     private static final String KEY_DARK_MODE = "DarkMode";
+    private static final String KEY_LANGUAGE = "Language";
 
     private final SharedPreferences pref;
     private final SharedPreferences.Editor editor;
@@ -64,8 +65,21 @@ public class SessionManager {
         return pref.getBoolean(KEY_DARK_MODE, false);
     }
 
+    public void setLanguage(String lang) {
+        editor.putString(KEY_LANGUAGE, lang);
+        editor.apply();
+    }
+
+    public String getLanguage() {
+        return pref.getString(KEY_LANGUAGE, "fr");
+    }
+
     public void logoutUser() {
+        boolean isDark = isDarkMode();
+        String lang = getLanguage();
         editor.clear();
+        editor.putBoolean(KEY_DARK_MODE, isDark);
+        editor.putString(KEY_LANGUAGE, lang);
         editor.apply();
     }
 }

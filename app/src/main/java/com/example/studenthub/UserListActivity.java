@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,7 +21,6 @@ import java.util.List;
 public class UserListActivity extends AppCompatActivity {
 
     private DatabaseHelper databaseHelper;
-    private SessionManager sessionManager;
     private RecyclerView recyclerViewUsers;
     private TextView tvUserCount, tvEmptyState;
     private TextInputEditText etSearchEmail;
@@ -32,13 +30,6 @@ public class UserListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        sessionManager = new SessionManager(this);
-        if (sessionManager.isDarkMode()) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
 
         setContentView(R.layout.activity_user_list);
 
@@ -113,7 +104,8 @@ public class UserListActivity extends AppCompatActivity {
         userAdapter = new UserAdapter(userList);
         recyclerViewUsers.setAdapter(userAdapter);
 
-        tvUserCount.setText(userList.size() + " utilisateur(s)");
+        int count = userList.size();
+        tvUserCount.setText(getResources().getQuantityString(R.plurals.users_count, count, count));
 
         if (userList.isEmpty()) {
             tvEmptyState.setVisibility(View.VISIBLE);

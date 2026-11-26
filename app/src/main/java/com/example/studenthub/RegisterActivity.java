@@ -18,7 +18,6 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Respects the active application theme
         setContentView(R.layout.activity_register);
 
         databaseHelper = new DatabaseHelper(this);
@@ -44,35 +43,44 @@ public class RegisterActivity extends AppCompatActivity {
         String confirmPassword = etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString() : "";
 
         if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            Toast.makeText(this, "Veuillez remplir tous les champs obligatoires.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.register_required_fields), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Veuillez saisir une adresse e-mail valide.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.register_invalid_email), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (password.length() < 6) {
-            Toast.makeText(this, "Le mot de passe doit contenir au moins 6 caractères.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.register_password_too_short), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            Toast.makeText(this, "Les mots de passe ne correspondent pas.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.register_passwords_mismatch), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (databaseHelper.checkEmailExists(email)) {
-            LottieFeedbackDialog.showError(this, "E-mail déjà utilisé", "Cet e-mail est déjà associé à un compte existant.", null);
+            LottieFeedbackDialog.showError(this,
+                    getString(R.string.register_email_exists_title),
+                    getString(R.string.register_email_exists_message),
+                    null);
             return;
         }
 
         boolean success = databaseHelper.addUser(nom, prenom, email, password);
         if (success) {
-            LottieFeedbackDialog.showSuccess(this, "Inscription réussie !", "Votre compte StudentHub a été créé avec succès.", this::finish);
+            LottieFeedbackDialog.showSuccess(this,
+                    getString(R.string.register_success_title),
+                    getString(R.string.register_success_message),
+                    this::finish);
         } else {
-            LottieFeedbackDialog.showError(this, "Échec de l'inscription", "Une erreur est survenue lors de la création de votre compte.", null);
+            LottieFeedbackDialog.showError(this,
+                    getString(R.string.register_error_title),
+                    getString(R.string.register_error_message),
+                    null);
         }
     }
 }

@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
@@ -19,6 +20,7 @@ public class HomeActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private TextView tvWelcome;
     private MaterialButton btnToggleTheme;
+    private MaterialButton btnToggleLang;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,7 @@ public class HomeActivity extends AppCompatActivity {
 
         tvWelcome = findViewById(R.id.tvWelcome);
         btnToggleTheme = findViewById(R.id.btnToggleTheme);
+        btnToggleLang = findViewById(R.id.btnToggleLang);
         ImageView ivProfileAvatar = findViewById(R.id.ivProfileAvatar);
 
         MaterialCardView cardMatieres = findViewById(R.id.cardMatieres);
@@ -49,17 +52,29 @@ public class HomeActivity extends AppCompatActivity {
             sessionManager.setDarkMode(newDark);
             if (newDark) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                Toast.makeText(this, getString(R.string.toast_theme_dark), Toast.LENGTH_SHORT).show();
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                Toast.makeText(this, getString(R.string.toast_theme_light), Toast.LENGTH_SHORT).show();
             }
+        });
+
+        // Language Toggle (FR / EN)
+        btnToggleLang.setOnClickListener(v -> {
+            String currentLang = sessionManager.getLanguage();
+            String newLang = "en".equalsIgnoreCase(currentLang) ? "fr" : "en";
+            sessionManager.setLanguage(newLang);
+
+            LocaleListCompat appLocales = LocaleListCompat.forLanguageTags(newLang);
+            AppCompatDelegate.setApplicationLocales(appLocales);
         });
 
         ivProfileAvatar.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
 
-        // Academic Feature Cards (Exercice 2 du TP)
-        cardMatieres.setOnClickListener(v -> showAcademicInfoDialog("Mes matières", "Retrouvez ici la liste de vos matières, coefficients et cours associés."));
-        cardTaches.setOnClickListener(v -> showAcademicInfoDialog("Mes tâches", "Consultez vos devoirs à accomplir, priorités et niveaux d'avancement."));
-        cardEcheances.setOnClickListener(v -> showAcademicInfoDialog("Prochaines échéances", "Planifiez votre charge de travail grâce aux dates limites de vos examens et projets."));
+        // Academic Feature Cards
+        cardMatieres.setOnClickListener(v -> showAcademicInfoDialog(getString(R.string.section_matieres_title), getString(R.string.section_matieres_info_message)));
+        cardTaches.setOnClickListener(v -> showAcademicInfoDialog(getString(R.string.section_taches_title), getString(R.string.section_taches_info_message)));
+        cardEcheances.setOnClickListener(v -> showAcademicInfoDialog(getString(R.string.section_echeances_title), getString(R.string.section_echeances_info_message)));
 
         // Primary Destination Cards
         cardProfile.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
@@ -100,15 +115,22 @@ public class HomeActivity extends AppCompatActivity {
     private void updateUI() {
         String prenom = sessionManager.getPrenom();
         if (prenom != null && !prenom.isEmpty()) {
-            tvWelcome.setText("Bienvenue, " + prenom + " !");
+            tvWelcome.setText(getString(R.string.welcome_user, prenom));
         } else {
-            tvWelcome.setText("Bienvenue !");
+            tvWelcome.setText(getString(R.string.welcome));
         }
 
         if (sessionManager.isDarkMode()) {
-            btnToggleTheme.setText("☾ Dark");
+            btnToggleTheme.setText(getString(R.string.theme_dark));
         } else {
-            btnToggleTheme.setText("☀ Light");
+            btnToggleTheme.setText(getString(R.string.theme_light));
+        }
+
+        String currentLang = sessionManager.getLanguage();
+        if ("en".equalsIgnoreCase(currentLang)) {
+            btnToggleLang.setText(getString(R.string.lang_en));
+        } else {
+            btnToggleLang.setText(getString(R.string.lang_fr));
         }
     }
 
@@ -116,22 +138,22 @@ public class HomeActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
     private void showLogoutConfirmationDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Déconnexion")
-                .setMessage("Voulez-vous vraiment vous déconnecter de StudentHub ?")
-                .setPositiveButton("Se déconnecter", (dialog, which) -> {
+                .setTitle(R.string.logout_confirm_title)
+                .setMessage(R.string.logout_confirm_message)
+                .setPositiveButton(R.string.logout_button, (dialog, which) -> {
                     sessionManager.logoutUser();
                     Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                 })
-                .setNegativeButton("Annuler", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
     }
 }

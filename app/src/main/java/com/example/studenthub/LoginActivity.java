@@ -21,7 +21,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         sessionManager = new SessionManager(this);
 
-        // Apply theme from SessionManager
         if (sessionManager.isDarkMode()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
@@ -60,19 +59,22 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText() != null ? etPassword.getText().toString() : "";
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Veuillez saisir votre e-mail et votre mot de passe.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.login_empty_fields), Toast.LENGTH_SHORT).show();
             return;
         }
 
         User user = databaseHelper.checkUser(email, password);
         if (user != null) {
             sessionManager.createLoginSession(user.getId(), user.getNom(), user.getPrenom(), user.getEmail());
-            Toast.makeText(this, "Connexion réussie.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
             finish();
         } else {
-            LottieFeedbackDialog.showError(this, "Connexion échouée", "E-mail ou mot de passe incorrect. Veuillez vérifier vos identifiants.", null);
+            LottieFeedbackDialog.showError(this,
+                    getString(R.string.login_failed_title),
+                    getString(R.string.login_failed_message),
+                    null);
         }
     }
 }

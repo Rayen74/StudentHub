@@ -24,7 +24,7 @@
             android:layout_height="36dp"
             app:srcCompat="@drawable/ic_arrow_back"
             app:tint="@color/white"
-            android:contentDescription="Back"
+            android:contentDescription="@string/cd_back_button"
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -35,7 +35,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="SÉCURITÉ &amp; MOT DE PASSE"
+            android:text="@string/security_page_title"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/white"
@@ -59,7 +59,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Changer de mot de passe"
+                android:text="@string/change_password_title"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
@@ -69,7 +69,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Modifiez votre mot de passe en toute sécurité"
+                android:text="@string/change_password_subtitle"
                 android:textSize="14sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="24dp" />
@@ -106,7 +106,7 @@
                         app:startIconDrawable="@drawable/ic_lock"
                         app:startIconTint="@color/primary"
                         app:endIconMode="password_toggle"
-                        android:hint="Mot de passe actuel">
+                        android:hint="@string/current_password_hint">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etCurrentPassword"
@@ -133,7 +133,7 @@
                         app:startIconDrawable="@drawable/ic_lock"
                         app:startIconTint="@color/primary"
                         app:endIconMode="password_toggle"
-                        android:hint="Nouveau mot de passe">
+                        android:hint="@string/new_password_hint">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etNewPassword"
@@ -160,7 +160,7 @@
                         app:startIconDrawable="@drawable/ic_lock"
                         app:startIconTint="@color/primary"
                         app:endIconMode="password_toggle"
-                        android:hint="Confirmer le nouveau mot de passe">
+                        android:hint="@string/confirm_new_password_hint">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etConfirmNewPassword"
@@ -180,7 +180,7 @@
                 android:id="@+id/btnUpdatePassword"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Mettre à jour le mot de passe"
+                android:text="@string/update_password_button"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:cornerRadius="14dp"

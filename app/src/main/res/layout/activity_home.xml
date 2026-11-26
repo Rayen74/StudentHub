@@ -22,7 +22,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="StudentHub — MENU"
+            android:text="@string/app_menu_title"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/white"
@@ -35,7 +35,7 @@
             android:layout_height="40dp"
             app:srcCompat="@drawable/ic_profile"
             app:tint="@color/primary"
-            android:contentDescription="Profile Avatar"
+            android:contentDescription="@string/cd_profile_avatar"
             android:background="@drawable/bg_circle_avatar"
             android:clickable="true"
             android:focusable="true"
@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Welcome Greeting Row with Inline Theme Selector -->
+            <!-- Welcome Greeting Row with Inline Theme & Language Selectors -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                         android:id="@+id/tvWelcome"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bienvenue !"
+                        android:text="@string/welcome"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/text_primary" />
@@ -82,24 +82,46 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Vue d'ensemble de votre vie universitaire"
+                        android:text="@string/dashboard_subtitle"
                         android:textSize="13sp"
                         android:textColor="@color/text_secondary" />
 
                 </LinearLayout>
 
-                <!-- Inline Theme Selector Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnToggleTheme"
+                <!-- Language and Theme Selectors Container -->
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:text="☀ / ☾ Theme"
-                    android:textSize="12sp"
-                    app:cornerRadius="20dp"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:textColor="@color/primary"
-                    app:strokeColor="@color/primary"
-                    android:paddingHorizontal="12dp" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Inline Language Selector Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnToggleLang"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="@string/lang_fr"
+                        android:textSize="12sp"
+                        app:cornerRadius="20dp"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:textColor="@color/primary"
+                        app:strokeColor="@color/primary"
+                        android:paddingHorizontal="10dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <!-- Inline Theme Selector Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnToggleTheme"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="@string/theme_light"
+                        android:textSize="12sp"
+                        app:cornerRadius="20dp"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:textColor="@color/primary"
+                        app:strokeColor="@color/primary"
+                        android:paddingHorizontal="10dp" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -141,12 +163,12 @@
                             app:srcCompat="@drawable/ic_matieres"
                             app:tint="@color/primary"
                             android:layout_marginBottom="10dp"
-                            android:contentDescription="Matières Icon" />
+                            android:contentDescription="@string/cd_matieres_icon" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Mes matières"
+                            android:text="@string/section_matieres_title"
                             android:textSize="15sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -155,7 +177,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Informations &amp; cours"
+                            android:text="@string/section_matieres_desc"
                             android:textSize="11sp"
                             android:textColor="@color/text_secondary"
                             android:maxLines="1"
@@ -193,12 +215,12 @@
                             app:srcCompat="@drawable/ic_taches"
                             app:tint="@color/secondary"
                             android:layout_marginBottom="10dp"
-                            android:contentDescription="Tâches Icon" />
+                            android:contentDescription="@string/cd_taches_icon" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Mes tâches"
+                            android:text="@string/section_taches_title"
                             android:textSize="15sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -207,7 +229,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Devoirs &amp; progression"
+                            android:text="@string/section_taches_desc"
                             android:textSize="11sp"
                             android:textColor="@color/text_secondary"
                             android:maxLines="1"
@@ -245,12 +267,12 @@
                             app:srcCompat="@drawable/ic_settings"
                             app:tint="@color/warning"
                             android:layout_marginBottom="10dp"
-                            android:contentDescription="Echéances Icon" />
+                            android:contentDescription="@string/cd_echeances_icon" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Prochaines échéances"
+                            android:text="@string/section_echeances_title"
                             android:textSize="15sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -259,7 +281,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Dates limites &amp; priorités"
+                            android:text="@string/section_echeances_desc"
                             android:textSize="11sp"
                             android:textColor="@color/text_secondary"
                             android:maxLines="1"
@@ -297,12 +319,12 @@
                             app:srcCompat="@drawable/ic_profile"
                             app:tint="@color/primary"
                             android:layout_marginBottom="10dp"
-                            android:contentDescription="Profile Icon" />
+                            android:contentDescription="@string/cd_profile_icon" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Profil"
+                            android:text="@string/section_profile_title"
                             android:textSize="15sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -311,7 +333,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Gestion de compte"
+                            android:text="@string/section_profile_desc"
                             android:textSize="11sp"
                             android:textColor="@color/text_secondary"
                             android:maxLines="1"
@@ -349,12 +371,12 @@
                             app:srcCompat="@drawable/ic_users"
                             app:tint="@color/secondary"
                             android:layout_marginBottom="10dp"
-                            android:contentDescription="Users Icon" />
+                            android:contentDescription="@string/cd_users_icon" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Utilisateurs"
+                            android:text="@string/section_users_title"
                             android:textSize="15sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -363,7 +385,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Annuaire SQLite"
+                            android:text="@string/section_users_desc"
                             android:textSize="11sp"
                             android:textColor="@color/text_secondary"
                             android:maxLines="1"
@@ -383,7 +405,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 4. Logout Action Button (Anchored immediately above BottomNavigationView) -->
+    <!-- Logout Action Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -395,7 +417,7 @@
             android:id="@+id/btnHomeLogout"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="Se déconnecter"
+            android:text="@string/logout_button"
             android:textSize="15sp"
             android:textStyle="bold"
             app:cornerRadius="12dp"
@@ -409,7 +431,7 @@
 
     </LinearLayout>
 
-    <!-- 5. Bottom Navigation Bar -->
+    <!-- Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"

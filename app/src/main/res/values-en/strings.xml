@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App & Common -->
+    <string name="app_name">StudentHub</string>
+    <string name="app_menu_title">StudentHub — MENU</string>
+    <string name="welcome">Welcome!</string>
+    <string name="welcome_user">Welcome, %1$s!</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="save">Save</string>
+    <string name="ok">OK</string>
+    <string name="edit">Edit</string>
+    <string name="search">Search</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="continue_text">Continue</string>
+    <string name="loading">Updating...</string>
+
+    <!-- Language Selector -->
+    <string name="lang_toggle">🌐 FR / EN</string>
+    <string name="lang_fr">🌐 FR</string>
+    <string name="lang_en">🌐 EN</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_users">Users</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Authentication (Login) -->
+    <string name="login_title">StudentHub</string>
+    <string name="login_subtitle">Your smart academic workspace</string>
+    <string name="login_button">Sign In</string>
+    <string name="login_email_hint">Email address</string>
+    <string name="login_password_hint">Password</string>
+    <string name="go_to_register_link">Don\'t have an account? Create an account</string>
+    <string name="login_success">Sign in successful.</string>
+    <string name="login_empty_fields">Please enter your email and password.</string>
+    <string name="login_failed_title">Sign In Failed</string>
+    <string name="login_failed_message">Incorrect email or password. Please check your credentials.</string>
+
+    <!-- Registration -->
+    <string name="register_title">Create an Account</string>
+    <string name="register_subtitle">Join StudentHub today</string>
+    <string name="register_nom_hint">Last Name</string>
+    <string name="register_prenom_hint">First Name</string>
+    <string name="register_email_hint">Email address</string>
+    <string name="register_password_hint">Password</string>
+    <string name="register_confirm_password_hint">Confirm password</string>
+    <string name="register_button">Sign Up</string>
+    <string name="go_to_login_link">Already have an account? Sign in</string>
+    <string name="register_required_fields">Please fill in all required fields.</string>
+    <string name="register_invalid_email">Please enter a valid email address.</string>
+    <string name="register_password_too_short">Password must be at least 6 characters long.</string>
+    <string name="register_passwords_mismatch">Passwords do not match.</string>
+    <string name="register_email_exists_title">Email Already Registered</string>
+    <string name="register_email_exists_message">This email is already associated with an existing account.</string>
+    <string name="register_success_title">Registration Successful!</string>
+    <string name="register_success_message">Your StudentHub account has been created successfully.</string>
+    <string name="register_error_title">Registration Failed</string>
+    <string name="register_error_message">An error occurred while creating your account.</string>
+
+    <!-- Home Dashboard -->
+    <string name="dashboard_subtitle">Overview of your university life</string>
+    <string name="section_matieres_title">My Courses</string>
+    <string name="section_matieres_desc">Info &amp; courses</string>
+    <string name="section_matieres_info_message">Find the list of your courses, coefficients, and key info here.</string>
+    <string name="section_taches_title">My Tasks</string>
+    <string name="section_taches_desc">Assignments &amp; progress</string>
+    <string name="section_taches_info_message">View your assignments, priorities, and completion progress.</string>
+    <string name="section_echeances_title">Upcoming Deadlines</string>
+    <string name="section_echeances_desc">Deadlines &amp; priorities</string>
+    <string name="section_echeances_info_message">Plan your workload with upcoming exam and project deadlines.</string>
+    <string name="section_profile_title">Profile</string>
+    <string name="section_profile_desc">Account management</string>
+    <string name="section_users_title">Users</string>
+    <string name="section_users_desc">SQLite Directory</string>
+    <string name="theme_dark">☾ Dark</string>
+    <string name="theme_light">☀ Light</string>
+    <string name="toast_theme_dark">Dark mode enabled</string>
+    <string name="toast_theme_light">Light mode enabled</string>
+    <string name="logout_button">Sign Out</string>
+    <string name="logout_desc">Leave session</string>
+    <string name="logout_confirm_title">Sign Out</string>
+    <string name="logout_confirm_message">Are you sure you want to sign out of StudentHub?</string>
+
+    <!-- Profile -->
+    <string name="profile_page_title">PROFILE</string>
+    <string name="profile_personal_info_header">Personal Information</string>
+    <string name="profile_nom_label">Last Name</string>
+    <string name="profile_prenom_label">First Name</string>
+    <string name="profile_email_label">Email address (Read-only)</string>
+    <string name="profile_created_at_label">Account created on: %1$s</string>
+    <string name="profile_created_at_na">Account created on: N/A</string>
+    <string name="profile_edit_button">Edit Profile</string>
+    <string name="profile_save_changes_button">Save Changes</string>
+    <string name="profile_update_success">Profile updated successfully.</string>
+    <string name="profile_update_error">Error updating profile.</string>
+    <string name="profile_empty_names_error">First and last names cannot be empty.</string>
+
+    <!-- Security & Password -->
+    <string name="security_page_title">SECURITY &amp; PASSWORD</string>
+    <string name="security_card_title">Account Security</string>
+    <string name="security_card_desc">Protect your account with a new password</string>
+    <string name="change_password_button">Change Password</string>
+    <string name="change_password_title">Change Password</string>
+    <string name="change_password_subtitle">Update your password securely</string>
+    <string name="change_password_requirements">Password must be at least 6 characters long and different from current.</string>
+    <string name="current_password_hint">Current password</string>
+    <string name="new_password_hint">New password</string>
+    <string name="confirm_new_password_hint">Confirm new password</string>
+    <string name="update_password_button">Update Password</string>
+    <string name="password_updated_successfully">Password updated successfully.</string>
+    <string name="password_update_error">Error updating password.</string>
+    <string name="password_current_incorrect">Current password is incorrect.</string>
+    <string name="password_too_short">New password must be at least 6 characters long.</string>
+    <string name="password_mismatch">New passwords do not match.</string>
+    <string name="password_same_as_current">New password must be different from current password.</string>
+
+    <!-- User Directory -->
+    <string name="user_list_title">USERS</string>
+    <string name="users_directory_header">Directory</string>
+    <string name="search_email_hint">Search by email</string>
+    <string name="empty_users_state">No users found</string>
+    <plurals name="users_count">
+        <item quantity="one">%1$d user</item>
+        <item quantity="other">%1$d users</item>
+    </plurals>
+
+    <!-- Accessibility Descriptions -->
+    <string name="cd_profile_avatar">Profile Avatar</string>
+    <string name="cd_back_button">Back Button</string>
+    <string name="cd_matieres_icon">Courses Icon</string>
+    <string name="cd_taches_icon">Tasks Icon</string>
+    <string name="cd_echeances_icon">Deadlines Icon</string>
+    <string name="cd_profile_icon">Profile Icon</string>
+    <string name="cd_users_icon">Users Icon</string>
+    <string name="cd_logout_icon">Logout Icon</string>
+    <string name="cd_security_icon">Security Icon</string>
+    <string name="cd_lock_icon">Lock Icon</string>
+</resources>
