@@ -1,12 +1,12 @@
 package com.example.studenthub;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -15,12 +15,12 @@ public class RegisterActivity extends AppCompatActivity {
 
     private TextInputEditText etNom, etPrenom, etEmail, etPassword, etConfirmPassword;
     private MaterialButton btnRegister;
-    private TextView tvGoToLogin;
     private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.activity_register);
 
         databaseHelper = new DatabaseHelper(this);
@@ -31,7 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etRegisterPassword);
         etConfirmPassword = findViewById(R.id.etRegisterConfirmPassword);
         btnRegister = findViewById(R.id.btnRegister);
-        tvGoToLogin = findViewById(R.id.tvGoToLogin);
+        TextView tvGoToLogin = findViewById(R.id.tvGoToLogin);
 
         btnRegister.setOnClickListener(v -> handleRegister());
 

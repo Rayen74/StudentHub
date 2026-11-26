@@ -15,12 +15,12 @@
         android:padding="24dp"
         android:gravity="center_horizontal">
 
-        <!-- Lottie Animation with Welcome.json -->
+        <!-- Top Lottie Animation -->
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/lottieLogin"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_marginTop="16dp"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_marginTop="24dp"
             app:lottie_rawRes="@raw/welcome"
             app:lottie_autoPlay="true"
             app:lottie_loop="true" />
@@ -29,57 +29,92 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="StudentHub"
-            android:textSize="28sp"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:textColor="@color/primary"
-            android:layout_marginTop="8dp" />
+            android:letterSpacing="0.02"
+            android:layout_marginTop="12dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Organisez votre vie universitaire"
+            android:text="Votre espace académique intelligent"
             android:textSize="14sp"
             android:textColor="@color/text_secondary"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="32dp" />
 
-        <!-- Email Input -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            app:boxStrokeColor="@color/primary"
-            app:hintTextColor="@color/primary"
-            android:hint="Adresse e-mail">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etLoginEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:maxLines="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Password Input -->
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Form Card Container -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            app:boxStrokeColor="@color/primary"
-            app:hintTextColor="@color/primary"
-            app:endIconMode="password_toggle"
-            android:hint="Mot de passe">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/borders"
+            app:cardBackgroundColor="@color/card_background">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etLoginPassword"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:maxLines="1" />
+                android:orientation="vertical"
+                android:padding="20dp">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <!-- Email Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="@color/primary"
+                    app:hintTextColor="@color/primary"
+                    app:startIconDrawable="@android:drawable/ic_dialog_email"
+                    app:startIconTint="@color/primary"
+                    android:hint="Adresse e-mail">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etLoginEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/input_text"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="@color/primary"
+                    app:hintTextColor="@color/primary"
+                    app:startIconDrawable="@android:drawable/ic_lock_lock"
+                    app:startIconTint="@color/primary"
+                    app:endIconMode="password_toggle"
+                    android:hint="Mot de passe">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etLoginPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/input_text"
+                        android:inputType="textPassword"
+                        android:maxLines="1" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Login Button -->
         <com.google.android.material.button.MaterialButton
@@ -88,9 +123,11 @@
             android:layout_height="56dp"
             android:text="Se connecter"
             android:textSize="16sp"
-            app:cornerRadius="12dp"
+            android:textStyle="bold"
+            app:cornerRadius="14dp"
             android:backgroundTint="@color/primary"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="24dp"
+            app:elevation="4dp" />
 
         <!-- Register Link -->
         <TextView
@@ -101,7 +138,10 @@
             android:textColor="@color/primary"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:padding="8dp" />
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground" />
 
     </LinearLayout>
 </ScrollView>
