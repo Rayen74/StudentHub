@@ -49,8 +49,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             if (oldVersion < 3) {
-                // Check if old column 'password' exists or migrate
-                // Create new temporary table or add column password_hash
                 db.execSQL("CREATE TABLE IF NOT EXISTS users_new (" +
                         COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         COLUMN_NOM + " TEXT NOT NULL, " +
@@ -60,7 +58,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP" +
                         ");");
 
-                // Check columns of existing users table
                 Cursor cursor = db.rawQuery("PRAGMA table_info(" + TABLE_USERS + ")", null);
                 boolean hasPasswordColumn = false;
                 boolean hasPasswordHashColumn = false;
@@ -74,11 +71,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
 
                 if (hasPasswordHashColumn) {
-                    // Already has password_hash, just copy
                     db.execSQL("INSERT OR IGNORE INTO users_new (" + COLUMN_ID + ", " + COLUMN_NOM + ", " + COLUMN_PRENOM + ", " + COLUMN_EMAIL + ", " + COLUMN_PASSWORD_HASH + ", " + COLUMN_CREATED_AT + ") " +
                             "SELECT " + COLUMN_ID + ", " + COLUMN_NOM + ", " + COLUMN_PRENOM + ", " + COLUMN_EMAIL + ", " + COLUMN_PASSWORD_HASH + ", " + COLUMN_CREATED_AT + " FROM " + TABLE_USERS);
                 } else if (hasPasswordColumn) {
-                    // Migrate plain text passwords to BCrypt hashes
                     Cursor userCursor = db.rawQuery("SELECT id, nom, prenom, email, password, created_at FROM " + TABLE_USERS, null);
                     if (userCursor != null) {
                         while (userCursor.moveToNext()) {
@@ -103,7 +98,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         userCursor.close();
                     }
                 } else {
-                    // Fallback table drop if schema unknown
                     db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
                     onCreate(db);
                     db.setTransactionSuccessful();
@@ -158,7 +152,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public User checkUser(String email, String plainPassword) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_USERS,
-                new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL, COLUMN_PASSWORD_HASH, COLUMN_CREATED_AT},
+                new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL, COLUMN_PASSWORD_HASH},
                 COLUMN_EMAIL + " = ?",
                 new String[]{email},
                 null, null, null);
@@ -173,10 +167,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String nom = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NOM));
                 String prenom = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRENOM));
                 String userEmail = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL));
-                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CREATED_AT));
 
-                user = new User(id, nom, prenom, userEmail, createdAt);
+                user = new User(id, nom, prenom, userEmail);
             }
+            cursor.close();
+        }
+        db.close();
+        return user;
+    }
+
+    public User getUserById(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USERS,
+                new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL},
+                COLUMN_ID + " = ?",
+                new String[]{String.valueOf(userId)},
+                null, null, null);
+
+        User user = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+            String nom = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NOM));
+            String prenom = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRENOM));
+            String userEmail = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL));
+
+            user = new User(id, nom, prenom, userEmail);
             cursor.close();
         }
         db.close();
@@ -226,9 +241,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        // NEVER retrieve password or password_hash!
+        // NEVER retrieve password or password_hash! Select only id, nom, prenom, email
         Cursor cursor = db.query(TABLE_USERS,
-                new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL, COLUMN_CREATED_AT},
+                new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL},
                 null, null, null, null, COLUMN_ID + " DESC");
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -237,9 +252,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String nom = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NOM));
                 String prenom = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRENOM));
                 String email = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL));
-                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CREATED_AT));
 
-                userList.add(new User(id, nom, prenom, email, createdAt));
+                userList.add(new User(id, nom, prenom, email));
             } while (cursor.moveToNext());
             cursor.close();
         }
@@ -250,9 +264,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<User> searchUsersByEmail(String emailQuery) {
         List<User> userList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        // NEVER retrieve password or password_hash!
+        // NEVER retrieve password or password_hash! Select only id, nom, prenom, email
         Cursor cursor = db.query(TABLE_USERS,
-                new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL, COLUMN_CREATED_AT},
+                new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL},
                 COLUMN_EMAIL + " LIKE ?",
                 new String[]{"%" + emailQuery + "%"},
                 null, null, COLUMN_ID + " DESC");
@@ -263,9 +277,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String nom = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NOM));
                 String prenom = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRENOM));
                 String email = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL));
-                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CREATED_AT));
 
-                userList.add(new User(id, nom, prenom, email, createdAt));
+                userList.add(new User(id, nom, prenom, email));
             } while (cursor.moveToNext());
             cursor.close();
         }

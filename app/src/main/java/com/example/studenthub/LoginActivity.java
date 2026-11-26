@@ -19,16 +19,16 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         sessionManager = new SessionManager(this);
 
-        // Apply dark mode preference
+        // Apply theme from SessionManager
         if (sessionManager.isDarkMode()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
+
+        super.onCreate(savedInstanceState);
 
         // Persistent Session Check: If already logged in, skip login
         if (sessionManager.isLoggedIn()) {
@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void handleLogin() {
         String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
-        String password = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
+        String password = etPassword.getText() != null ? etPassword.getText().toString() : "";
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Veuillez saisir votre e-mail et votre mot de passe.", Toast.LENGTH_SHORT).show();
@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         } else {
-            Toast.makeText(this, "E-mail ou mot de passe incorrect.", Toast.LENGTH_SHORT).show();
+            LottieFeedbackDialog.showError(this, "Connexion échouée", "E-mail ou mot de passe incorrect. Veuillez vérifier vos identifiants.", null);
         }
     }
 }

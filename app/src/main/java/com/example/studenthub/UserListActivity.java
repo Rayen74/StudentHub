@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,7 +52,14 @@ public class UserListActivity extends AppCompatActivity {
 
         recyclerViewUsers.setLayoutManager(new LinearLayoutManager(this));
 
-        ivBack.setOnClickListener(v -> finish());
+        // Back navigation returns to Home
+        ivBack.setOnClickListener(v -> navigateToHome());
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                navigateToHome();
+            }
+        });
 
         loadUsers("");
 
@@ -73,22 +81,26 @@ public class UserListActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
-                Intent intent = new Intent(UserListActivity.this, HomeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                finish();
+                navigateToHome();
                 return true;
             } else if (id == R.id.nav_users) {
                 return true;
             } else if (id == R.id.nav_profile) {
                 Intent intent = new Intent(UserListActivity.this, ProfileActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 finish();
                 return true;
             }
             return false;
         });
+    }
+
+    private void navigateToHome() {
+        Intent intent = new Intent(UserListActivity.this, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 
     private void loadUsers(String query) {

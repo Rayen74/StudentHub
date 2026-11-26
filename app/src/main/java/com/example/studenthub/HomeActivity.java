@@ -11,12 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
 public class HomeActivity extends AppCompatActivity {
 
     private SessionManager sessionManager;
     private TextView tvWelcome;
+    private MaterialButton btnToggleTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,71 +26,63 @@ public class HomeActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
 
-        // Apply theme
-        if (sessionManager.isDarkMode()) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-
         setContentView(R.layout.activity_home);
 
         tvWelcome = findViewById(R.id.tvWelcome);
+        btnToggleTheme = findViewById(R.id.btnToggleTheme);
         ImageView ivProfileAvatar = findViewById(R.id.ivProfileAvatar);
+
+        MaterialCardView cardMatieres = findViewById(R.id.cardMatieres);
+        MaterialCardView cardTaches = findViewById(R.id.cardTaches);
+        MaterialCardView cardEcheances = findViewById(R.id.cardEcheances);
         MaterialCardView cardProfile = findViewById(R.id.cardProfile);
         MaterialCardView cardUsers = findViewById(R.id.cardUsers);
-        MaterialCardView cardSecurity = findViewById(R.id.cardSecurity);
-        MaterialCardView cardSettings = findViewById(R.id.cardSettings);
-        MaterialCardView cardLogout = findViewById(R.id.cardLogout);
+        MaterialButton btnHomeLogout = findViewById(R.id.btnHomeLogout);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         updateUI();
 
-        // Avatar click -> ProfileActivity
-        ivProfileAvatar.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
-
-        // Card 1: Profile -> ProfileActivity
-        cardProfile.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
-
-        // Card 2: Users -> UserListActivity
-        cardUsers.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, UserListActivity.class)));
-
-        // Card 3: Security -> ProfileActivity (Password management is inside Profile)
-        cardSecurity.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
-
-        // Card 4: Settings (Toggle Dark Mode)
-        cardSettings.setOnClickListener(v -> {
+        // Theme Toggle
+        btnToggleTheme.setOnClickListener(v -> {
             boolean currentDark = sessionManager.isDarkMode();
             boolean newDark = !currentDark;
             sessionManager.setDarkMode(newDark);
             if (newDark) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                Toast.makeText(this, "Mode sombre activé", Toast.LENGTH_SHORT).show();
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                Toast.makeText(this, "Mode clair activé", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Card 5: Logout with confirmation
-        cardLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
+        ivProfileAvatar.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
+
+        // Academic Feature Cards (Exercice 2 du TP)
+        cardMatieres.setOnClickListener(v -> showAcademicInfoDialog("Mes matières", "Retrouvez ici la liste de vos matières, coefficients et cours associés."));
+        cardTaches.setOnClickListener(v -> showAcademicInfoDialog("Mes tâches", "Consultez vos devoirs à accomplir, priorités et niveaux d'avancement."));
+        cardEcheances.setOnClickListener(v -> showAcademicInfoDialog("Prochaines échéances", "Planifiez votre charge de travail grâce aux dates limites de vos examens et projets."));
+
+        // Primary Destination Cards
+        cardProfile.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
+        cardUsers.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, UserListActivity.class)));
+
+        // Logout
+        btnHomeLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
 
         // Bottom Navigation
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
-                // Already on home dashboard
                 return true;
             } else if (id == R.id.nav_users) {
                 Intent intent = new Intent(HomeActivity.this, UserListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 finish();
                 return true;
             } else if (id == R.id.nav_profile) {
                 Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 finish();
                 return true;
@@ -110,6 +104,20 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             tvWelcome.setText("Bienvenue !");
         }
+
+        if (sessionManager.isDarkMode()) {
+            btnToggleTheme.setText("☾ Dark");
+        } else {
+            btnToggleTheme.setText("☀ Light");
+        }
+    }
+
+    private void showAcademicInfoDialog(String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private void showLogoutConfirmationDialog() {

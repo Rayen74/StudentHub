@@ -6,7 +6,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -14,13 +13,12 @@ import com.google.android.material.textfield.TextInputEditText;
 public class RegisterActivity extends AppCompatActivity {
 
     private TextInputEditText etNom, etPrenom, etEmail, etPassword, etConfirmPassword;
-    private MaterialButton btnRegister;
     private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        // Respects the active application theme
         setContentView(R.layout.activity_register);
 
         databaseHelper = new DatabaseHelper(this);
@@ -30,7 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etRegisterEmail);
         etPassword = findViewById(R.id.etRegisterPassword);
         etConfirmPassword = findViewById(R.id.etRegisterConfirmPassword);
-        btnRegister = findViewById(R.id.btnRegister);
+        MaterialButton btnRegister = findViewById(R.id.btnRegister);
         TextView tvGoToLogin = findViewById(R.id.tvGoToLogin);
 
         btnRegister.setOnClickListener(v -> handleRegister());
@@ -42,8 +40,8 @@ public class RegisterActivity extends AppCompatActivity {
         String nom = etNom.getText() != null ? etNom.getText().toString().trim() : "";
         String prenom = etPrenom.getText() != null ? etPrenom.getText().toString().trim() : "";
         String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
-        String password = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
-        String confirmPassword = etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString().trim() : "";
+        String password = etPassword.getText() != null ? etPassword.getText().toString() : "";
+        String confirmPassword = etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString() : "";
 
         if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             Toast.makeText(this, "Veuillez remplir tous les champs obligatoires.", Toast.LENGTH_SHORT).show();
@@ -55,22 +53,26 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
+        if (password.length() < 6) {
+            Toast.makeText(this, "Le mot de passe doit contenir au moins 6 caractères.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (!password.equals(confirmPassword)) {
             Toast.makeText(this, "Les mots de passe ne correspondent pas.", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (databaseHelper.checkEmailExists(email)) {
-            Toast.makeText(this, "Cet e-mail est déjà utilisé par un autre compte.", Toast.LENGTH_SHORT).show();
+            LottieFeedbackDialog.showError(this, "E-mail déjà utilisé", "Cet e-mail est déjà associé à un compte existant.", null);
             return;
         }
 
         boolean success = databaseHelper.addUser(nom, prenom, email, password);
         if (success) {
-            Toast.makeText(this, "Inscription réussie ! Veuillez vous connecter.", Toast.LENGTH_LONG).show();
-            finish();
+            LottieFeedbackDialog.showSuccess(this, "Inscription réussie !", "Votre compte StudentHub a été créé avec succès.", this::finish);
         } else {
-            Toast.makeText(this, "Erreur lors de la création du compte.", Toast.LENGTH_SHORT).show();
+            LottieFeedbackDialog.showError(this, "Échec de l'inscription", "Une erreur est survenue lors de la création de votre compte.", null);
         }
     }
 }

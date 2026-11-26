@@ -72,7 +72,7 @@
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxStrokeColor="@color/primary"
                     app:hintTextColor="@color/primary"
-                    app:startIconDrawable="@android:drawable/ic_dialog_email"
+                    app:startIconDrawable="@drawable/ic_profile"
                     app:startIconTint="@color/primary"
                     android:hint="Adresse e-mail">
 
@@ -98,7 +98,7 @@
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxStrokeColor="@color/primary"
                     app:hintTextColor="@color/primary"
-                    app:startIconDrawable="@android:drawable/ic_lock_lock"
+                    app:startIconDrawable="@drawable/ic_lock"
                     app:startIconTint="@color/primary"
                     app:endIconMode="password_toggle"
                     android:hint="Mot de passe">
