@@ -14,7 +14,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "gestion_comptes.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     public static final String TABLE_USERS = "users";
     public static final String COLUMN_ID = "id";
@@ -24,7 +24,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PASSWORD_HASH = "password_hash";
     public static final String COLUMN_CREATED_AT = "created_at";
 
-    private static final String TABLE_CREATE =
+    public static final String TABLE_SUBJECTS = "subjects";
+    public static final String SUB_ID = "id";
+    public static final String SUB_NAME = "name";
+    public static final String SUB_CODE = "code";
+    public static final String SUB_TEACHER = "teacher";
+    public static final String SUB_DESC = "description";
+    public static final String SUB_USER_ID = "user_id";
+
+    private static final String TABLE_USERS_CREATE =
             "CREATE TABLE " + TABLE_USERS + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_NOM + " TEXT NOT NULL, " +
@@ -34,14 +42,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP" +
                     ");";
 
+    private static final String TABLE_SUBJECTS_CREATE =
+            "CREATE TABLE " + TABLE_SUBJECTS + " (" +
+                    SUB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    SUB_NAME + " TEXT NOT NULL, " +
+                    SUB_CODE + " TEXT NOT NULL, " +
+                    SUB_TEACHER + " TEXT, " +
+                    SUB_DESC + " TEXT, " +
+                    SUB_USER_ID + " INTEGER NOT NULL, " +
+                    "FOREIGN KEY (" + SUB_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_ID + ") ON DELETE CASCADE" +
+                    ");";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.setForeignKeyConstraintsEnabled(true);
+    }
+
+    @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_CREATE);
+        db.execSQL(TABLE_USERS_CREATE);
+        db.execSQL(TABLE_SUBJECTS_CREATE);
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_users_email ON " + TABLE_USERS + "(" + COLUMN_EMAIL + ")");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_subjects_user_id ON " + TABLE_SUBJECTS + "(" + SUB_USER_ID + ")");
     }
 
     @Override
@@ -49,6 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             if (oldVersion < 3) {
+                // v1/v2 to v3 migration logic
                 db.execSQL("CREATE TABLE IF NOT EXISTS users_new (" +
                         COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         COLUMN_NOM + " TEXT NOT NULL, " +
@@ -97,16 +125,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         }
                         userCursor.close();
                     }
-                } else {
-                    db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-                    onCreate(db);
-                    db.setTransactionSuccessful();
-                    return;
                 }
-
-                db.execSQL("DROP TABLE " + TABLE_USERS);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
                 db.execSQL("ALTER TABLE users_new RENAME TO " + TABLE_USERS);
             }
+
+            if (oldVersion < 4) {
+                // Add subjects table for version 4 upgrade without dropping users
+                db.execSQL(TABLE_SUBJECTS_CREATE);
+            }
+
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,7 +142,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_users_email ON " + TABLE_USERS + "(" + COLUMN_EMAIL + ")");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_subjects_user_id ON " + TABLE_SUBJECTS + "(" + SUB_USER_ID + ")");
     }
+
+    // --- User CRUD methods ---
 
     public boolean addUser(String nom, String prenom, String email, String plainPassword) {
         if (checkEmailExists(email)) {
@@ -241,7 +272,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        // NEVER retrieve password or password_hash! Select only id, nom, prenom, email
         Cursor cursor = db.query(TABLE_USERS,
                 new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL},
                 null, null, null, null, COLUMN_ID + " DESC");
@@ -264,7 +294,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<User> searchUsersByEmail(String emailQuery) {
         List<User> userList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        // NEVER retrieve password or password_hash! Select only id, nom, prenom, email
         Cursor cursor = db.query(TABLE_USERS,
                 new String[]{COLUMN_ID, COLUMN_NOM, COLUMN_PRENOM, COLUMN_EMAIL},
                 COLUMN_EMAIL + " LIKE ?",
@@ -284,5 +313,95 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         db.close();
         return userList;
+    }
+
+    // --- Subject CRUD methods (with mandatory ownership protection) ---
+
+    public long insertSubject(Subject subject) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(SUB_NAME, subject.getName());
+        values.put(SUB_CODE, subject.getCode());
+        values.put(SUB_TEACHER, subject.getTeacher());
+        values.put(SUB_DESC, subject.getDescription());
+        values.put(SUB_USER_ID, subject.getUserId());
+
+        long id = db.insert(TABLE_SUBJECTS, null, values);
+        db.close();
+        return id;
+    }
+
+    public List<Subject> getSubjectsByUser(int userId) {
+        List<Subject> subjects = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SUBJECTS,
+                new String[]{SUB_ID, SUB_NAME, SUB_CODE, SUB_TEACHER, SUB_DESC, SUB_USER_ID},
+                SUB_USER_ID + " = ?",
+                new String[]{String.valueOf(userId)},
+                null, null, SUB_ID + " DESC");
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(SUB_ID));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(SUB_NAME));
+                String code = cursor.getString(cursor.getColumnIndexOrThrow(SUB_CODE));
+                String teacher = cursor.getString(cursor.getColumnIndexOrThrow(SUB_TEACHER));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(SUB_DESC));
+                int uId = cursor.getInt(cursor.getColumnIndexOrThrow(SUB_USER_ID));
+
+                subjects.add(new Subject(id, name, code, teacher, description, uId));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        db.close();
+        return subjects;
+    }
+
+    public Subject getSubjectByIdAndUser(int subjectId, int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SUBJECTS,
+                new String[]{SUB_ID, SUB_NAME, SUB_CODE, SUB_TEACHER, SUB_DESC, SUB_USER_ID},
+                SUB_ID + " = ? AND " + SUB_USER_ID + " = ?",
+                new String[]{String.valueOf(subjectId), String.valueOf(userId)},
+                null, null, null);
+
+        Subject subject = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(SUB_ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(SUB_NAME));
+            String code = cursor.getString(cursor.getColumnIndexOrThrow(SUB_CODE));
+            String teacher = cursor.getString(cursor.getColumnIndexOrThrow(SUB_TEACHER));
+            String description = cursor.getString(cursor.getColumnIndexOrThrow(SUB_DESC));
+            int uId = cursor.getInt(cursor.getColumnIndexOrThrow(SUB_USER_ID));
+
+            subject = new Subject(id, name, code, teacher, description, uId);
+            cursor.close();
+        }
+        db.close();
+        return subject;
+    }
+
+    public boolean updateSubject(Subject subject, int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(SUB_NAME, subject.getName());
+        values.put(SUB_CODE, subject.getCode());
+        values.put(SUB_TEACHER, subject.getTeacher());
+        values.put(SUB_DESC, subject.getDescription());
+
+        int rows = db.update(TABLE_SUBJECTS, values,
+                SUB_ID + " = ? AND " + SUB_USER_ID + " = ?",
+                new String[]{String.valueOf(subject.getId()), String.valueOf(userId)});
+        db.close();
+        return rows > 0;
+    }
+
+    public boolean deleteSubject(int subjectId, int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rows = db.delete(TABLE_SUBJECTS,
+                SUB_ID + " = ? AND " + SUB_USER_ID + " = ?",
+                new String[]{String.valueOf(subjectId), String.valueOf(userId)});
+        db.close();
+        return rows > 0;
     }
 }

@@ -38,12 +38,22 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".SecurityActivity"
+            android:name=".UserListActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".UserListActivity"
+            android:name=".SubjectsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".AddSubjectActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".SubjectDetailsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 

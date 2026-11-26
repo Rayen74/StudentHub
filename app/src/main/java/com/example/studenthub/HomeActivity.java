@@ -72,7 +72,11 @@ public class HomeActivity extends AppCompatActivity {
         ivProfileAvatar.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
 
         // Academic Feature Cards
-        cardMatieres.setOnClickListener(v -> showAcademicInfoDialog(getString(R.string.section_matieres_title), getString(R.string.section_matieres_info_message)));
+        cardMatieres.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, SubjectsActivity.class);
+            startActivity(intent);
+        });
+
         cardTaches.setOnClickListener(v -> showAcademicInfoDialog(getString(R.string.section_taches_title), getString(R.string.section_taches_info_message)));
         cardEcheances.setOnClickListener(v -> showAcademicInfoDialog(getString(R.string.section_echeances_title), getString(R.string.section_echeances_info_message)));
 

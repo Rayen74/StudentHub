@@ -126,6 +126,35 @@
         <item quantity="other">%1$d users</item>
     </plurals>
 
+    <!-- Subject Management -->
+    <string name="subjects_title">My Courses</string>
+    <string name="add_subject">Add Course</string>
+    <string name="edit_subject">Edit Course</string>
+    <string name="subject_name">Course Name</string>
+    <string name="subject_code">Course Code</string>
+    <string name="teacher_name">Teacher Name</string>
+    <string name="subject_description">Description / Notes</string>
+    <string name="subject_details">Course Details</string>
+    <string name="no_subjects">You haven\'t added any courses yet.</string>
+    <string name="add_subject_button">Add</string>
+    <string name="save_subject_changes">Save Changes</string>
+    <string name="subject_added_successfully">Course added successfully.</string>
+    <string name="subject_updated_successfully">Course updated successfully.</string>
+    <string name="subject_deleted_successfully">Course deleted successfully.</string>
+    <string name="subject_name_required">Please enter the course name.</string>
+    <string name="subject_code_required">Please enter the course code.</string>
+    <string name="subject_not_found">Course not found.</string>
+    <string name="subject_load_error">Error loading course.</string>
+    <string name="subject_save_error">Error saving course.</string>
+    <string name="subject_delete_error">Error deleting course.</string>
+    <string name="delete_subject_title">Delete Course</string>
+    <string name="delete_subject_confirmation">Are you sure you want to delete this course?</string>
+    <string name="teacher_not_specified">Teacher not specified</string>
+    <string name="description_not_available">No description available</string>
+    <string name="modifier">Edit</string>
+    <string name="supprimer">Delete</string>
+    <string name="details">Details</string>
+
     <!-- Accessibility Descriptions -->
     <string name="cd_profile_avatar">Profile Avatar</string>
     <string name="cd_back_button">Back Button</string>

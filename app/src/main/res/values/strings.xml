@@ -126,6 +126,35 @@
         <item quantity="other">%1$d utilisateurs</item>
     </plurals>
 
+    <!-- Subject Management -->
+    <string name="subjects_title">Mes matières</string>
+    <string name="add_subject">Ajouter une matière</string>
+    <string name="edit_subject">Modifier une matière</string>
+    <string name="subject_name">Nom de la matière</string>
+    <string name="subject_code">Code de la matière</string>
+    <string name="teacher_name">Nom de l\'enseignant</string>
+    <string name="subject_description">Description / Notes</string>
+    <string name="subject_details">Détails de la matière</string>
+    <string name="no_subjects">Vous n\'avez encore ajouté aucune matière.</string>
+    <string name="add_subject_button">Ajouter</string>
+    <string name="save_subject_changes">Enregistrer les modifications</string>
+    <string name="subject_added_successfully">Matière ajoutée avec succès.</string>
+    <string name="subject_updated_successfully">Matière modifiée avec succès.</string>
+    <string name="subject_deleted_successfully">Matière supprimée avec succès.</string>
+    <string name="subject_name_required">Veuillez saisir le nom de la matière.</string>
+    <string name="subject_code_required">Veuillez saisir le code de la matière.</string>
+    <string name="subject_not_found">Matière introuvable.</string>
+    <string name="subject_load_error">Erreur lors du chargement de la matière.</string>
+    <string name="subject_save_error">Erreur lors de l\'enregistrement de la matière.</string>
+    <string name="subject_delete_error">Erreur lors de la suppression de la matière.</string>
+    <string name="delete_subject_title">Supprimer la matière</string>
+    <string name="delete_subject_confirmation">Voulez-vous vraiment supprimer cette matière ?</string>
+    <string name="teacher_not_specified">Enseignant non spécifié</string>
+    <string name="description_not_available">Aucune description disponible</string>
+    <string name="modifier">Modifier</string>
+    <string name="supprimer">Supprimer</string>
+    <string name="details">Détails</string>
+
     <!-- Accessibility Descriptions -->
     <string name="cd_profile_avatar">Avatar du profil</string>
     <string name="cd_back_button">Bouton retour</string>
