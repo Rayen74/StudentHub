@@ -14,21 +14,37 @@ import com.google.android.material.textfield.TextInputEditText;
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText etEmail, etPassword;
-    private MaterialButton btnLogin;
     private DatabaseHelper databaseHelper;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Force Light Mode to ensure consistent appearance across devices (e.g. Oppo ColorOS) matching Android Studio preview
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+        sessionManager = new SessionManager(this);
+
+        // Apply dark mode preference
+        if (sessionManager.isDarkMode()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
+        // Persistent Session Check: If already logged in, skip login
+        if (sessionManager.isLoggedIn()) {
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
 
         databaseHelper = new DatabaseHelper(this);
 
         etEmail = findViewById(R.id.etLoginEmail);
         etPassword = findViewById(R.id.etLoginPassword);
-        btnLogin = findViewById(R.id.btnLogin);
+        MaterialButton btnLogin = findViewById(R.id.btnLogin);
         TextView tvGoToRegister = findViewById(R.id.tvGoToRegister);
 
         btnLogin.setOnClickListener(v -> handleLogin());
@@ -50,11 +66,9 @@ public class LoginActivity extends AppCompatActivity {
 
         User user = databaseHelper.checkUser(email, password);
         if (user != null) {
+            sessionManager.createLoginSession(user.getId(), user.getNom(), user.getPrenom(), user.getEmail());
             Toast.makeText(this, "Connexion réussie.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-            intent.putExtra("USER_PRENOM", user.getPrenom());
-            intent.putExtra("USER_NOM", user.getNom());
-            intent.putExtra("USER_EMAIL", user.getEmail());
             startActivity(intent);
             finish();
         } else {
