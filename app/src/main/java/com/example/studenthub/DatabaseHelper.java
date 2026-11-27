@@ -14,7 +14,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "gestion_comptes.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     public static final String TABLE_USERS = "users";
     public static final String COLUMN_ID = "id";
@@ -31,6 +31,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String SUB_TEACHER = "teacher";
     public static final String SUB_DESC = "description";
     public static final String SUB_USER_ID = "user_id";
+
+    public static final String TABLE_TASKS = "tasks";
+    public static final String TASK_ID = "id";
+    public static final String TASK_TITLE = "title";
+    public static final String TASK_DESC = "description";
+    public static final String TASK_DUE_DATE = "due_date";
+    public static final String TASK_PRIORITY = "priority";
+    public static final String TASK_STATUS = "status";
+    public static final String TASK_SUBJECT_ID = "subject_id";
+    public static final String TASK_USER_ID = "user_id";
 
     private static final String TABLE_USERS_CREATE =
             "CREATE TABLE " + TABLE_USERS + " (" +
@@ -53,6 +63,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY (" + SUB_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_ID + ") ON DELETE CASCADE" +
                     ");";
 
+    private static final String TABLE_TASKS_CREATE =
+            "CREATE TABLE " + TABLE_TASKS + " (" +
+                    TASK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    TASK_TITLE + " TEXT NOT NULL, " +
+                    TASK_DESC + " TEXT, " +
+                    TASK_DUE_DATE + " TEXT, " +
+                    TASK_PRIORITY + " TEXT, " +
+                    TASK_STATUS + " TEXT, " +
+                    TASK_SUBJECT_ID + " INTEGER NOT NULL, " +
+                    TASK_USER_ID + " INTEGER NOT NULL, " +
+                    "FOREIGN KEY (" + TASK_SUBJECT_ID + ") REFERENCES " + TABLE_SUBJECTS + "(" + SUB_ID + ") ON DELETE CASCADE, " +
+                    "FOREIGN KEY (" + TASK_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_ID + ") ON DELETE CASCADE" +
+                    ");";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -67,8 +91,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TABLE_USERS_CREATE);
         db.execSQL(TABLE_SUBJECTS_CREATE);
+        db.execSQL(TABLE_TASKS_CREATE);
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_users_email ON " + TABLE_USERS + "(" + COLUMN_EMAIL + ")");
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_subjects_user_id ON " + TABLE_SUBJECTS + "(" + SUB_USER_ID + ")");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON " + TABLE_TASKS + "(" + TASK_USER_ID + ")");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_tasks_subject_id ON " + TABLE_TASKS + "(" + TASK_SUBJECT_ID + ")");
     }
 
     @Override
@@ -135,6 +162,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL(TABLE_SUBJECTS_CREATE);
             }
 
+            if (oldVersion < 5) {
+                // Add tasks table for version 5 upgrade without dropping users or subjects
+                db.execSQL(TABLE_TASKS_CREATE);
+            }
+
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -143,6 +175,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_users_email ON " + TABLE_USERS + "(" + COLUMN_EMAIL + ")");
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_subjects_user_id ON " + TABLE_SUBJECTS + "(" + SUB_USER_ID + ")");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON " + TABLE_TASKS + "(" + TASK_USER_ID + ")");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_tasks_subject_id ON " + TABLE_TASKS + "(" + TASK_SUBJECT_ID + ")");
     }
 
     // --- User CRUD methods ---
@@ -401,6 +435,187 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int rows = db.delete(TABLE_SUBJECTS,
                 SUB_ID + " = ? AND " + SUB_USER_ID + " = ?",
                 new String[]{String.valueOf(subjectId), String.valueOf(userId)});
+        db.close();
+        return rows > 0;
+    }
+
+    // --- Task CRUD methods (with mandatory ownership protection) ---
+
+    public long insertTask(Task task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TASK_TITLE, task.getTitle());
+        values.put(TASK_DESC, task.getDescription());
+        values.put(TASK_DUE_DATE, task.getDueDate());
+        values.put(TASK_PRIORITY, task.getPriority());
+        values.put(TASK_STATUS, task.getStatus());
+        values.put(TASK_SUBJECT_ID, task.getSubjectId());
+        values.put(TASK_USER_ID, task.getUserId());
+
+        long id = db.insert(TABLE_TASKS, null, values);
+        db.close();
+        return id;
+    }
+
+    public List<Task> getTasksByUser(int userId) {
+        List<Task> tasks = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_TASKS,
+                new String[]{TASK_ID, TASK_TITLE, TASK_DESC, TASK_DUE_DATE, TASK_PRIORITY, TASK_STATUS, TASK_SUBJECT_ID, TASK_USER_ID},
+                TASK_USER_ID + " = ?",
+                new String[]{String.valueOf(userId)},
+                null, null, TASK_ID + " DESC");
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_ID));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(TASK_TITLE));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(TASK_DESC));
+                String dueDate = cursor.getString(cursor.getColumnIndexOrThrow(TASK_DUE_DATE));
+                String priority = cursor.getString(cursor.getColumnIndexOrThrow(TASK_PRIORITY));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow(TASK_STATUS));
+                int subjectId = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_SUBJECT_ID));
+                int uId = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_USER_ID));
+
+                tasks.add(new Task(id, title, description, dueDate, priority, status, subjectId, uId));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        db.close();
+        return tasks;
+    }
+
+    public List<Task> getTasksBySubject(int subjectId) {
+        List<Task> tasks = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_TASKS,
+                new String[]{TASK_ID, TASK_TITLE, TASK_DESC, TASK_DUE_DATE, TASK_PRIORITY, TASK_STATUS, TASK_SUBJECT_ID, TASK_USER_ID},
+                TASK_SUBJECT_ID + " = ?",
+                new String[]{String.valueOf(subjectId)},
+                null, null, TASK_ID + " DESC");
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_ID));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(TASK_TITLE));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(TASK_DESC));
+                String dueDate = cursor.getString(cursor.getColumnIndexOrThrow(TASK_DUE_DATE));
+                String priority = cursor.getString(cursor.getColumnIndexOrThrow(TASK_PRIORITY));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow(TASK_STATUS));
+                int sId = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_SUBJECT_ID));
+                int uId = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_USER_ID));
+
+                tasks.add(new Task(id, title, description, dueDate, priority, status, sId, uId));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        db.close();
+        return tasks;
+    }
+
+    public List<Task> getTasksBySubject(int subjectId, int userId) {
+        List<Task> tasks = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_TASKS,
+                new String[]{TASK_ID, TASK_TITLE, TASK_DESC, TASK_DUE_DATE, TASK_PRIORITY, TASK_STATUS, TASK_SUBJECT_ID, TASK_USER_ID},
+                TASK_SUBJECT_ID + " = ? AND " + TASK_USER_ID + " = ?",
+                new String[]{String.valueOf(subjectId), String.valueOf(userId)},
+                null, null, TASK_ID + " DESC");
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_ID));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(TASK_TITLE));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(TASK_DESC));
+                String dueDate = cursor.getString(cursor.getColumnIndexOrThrow(TASK_DUE_DATE));
+                String priority = cursor.getString(cursor.getColumnIndexOrThrow(TASK_PRIORITY));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow(TASK_STATUS));
+                int sId = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_SUBJECT_ID));
+                int uId = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_USER_ID));
+
+                tasks.add(new Task(id, title, description, dueDate, priority, status, sId, uId));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        db.close();
+        return tasks;
+    }
+
+    public Task getTaskByIdAndUser(int taskId, int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_TASKS,
+                new String[]{TASK_ID, TASK_TITLE, TASK_DESC, TASK_DUE_DATE, TASK_PRIORITY, TASK_STATUS, TASK_SUBJECT_ID, TASK_USER_ID},
+                TASK_ID + " = ? AND " + TASK_USER_ID + " = ?",
+                new String[]{String.valueOf(taskId), String.valueOf(userId)},
+                null, null, null);
+
+        Task task = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_ID));
+            String title = cursor.getString(cursor.getColumnIndexOrThrow(TASK_TITLE));
+            String description = cursor.getString(cursor.getColumnIndexOrThrow(TASK_DESC));
+            String dueDate = cursor.getString(cursor.getColumnIndexOrThrow(TASK_DUE_DATE));
+            String priority = cursor.getString(cursor.getColumnIndexOrThrow(TASK_PRIORITY));
+            String status = cursor.getString(cursor.getColumnIndexOrThrow(TASK_STATUS));
+            int subjectId = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_SUBJECT_ID));
+            int uId = cursor.getInt(cursor.getColumnIndexOrThrow(TASK_USER_ID));
+
+            task = new Task(id, title, description, dueDate, priority, status, subjectId, uId);
+            cursor.close();
+        }
+        db.close();
+        return task;
+    }
+
+    public boolean updateTask(Task task, int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TASK_TITLE, task.getTitle());
+        values.put(TASK_DESC, task.getDescription());
+        values.put(TASK_DUE_DATE, task.getDueDate());
+        values.put(TASK_PRIORITY, task.getPriority());
+        values.put(TASK_STATUS, task.getStatus());
+        values.put(TASK_SUBJECT_ID, task.getSubjectId());
+
+        int rows = db.update(TABLE_TASKS, values,
+                TASK_ID + " = ? AND " + TASK_USER_ID + " = ?",
+                new String[]{String.valueOf(task.getId()), String.valueOf(userId)});
+        db.close();
+        return rows > 0;
+    }
+
+    public boolean updateTask(Task task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TASK_TITLE, task.getTitle());
+        values.put(TASK_DESC, task.getDescription());
+        values.put(TASK_DUE_DATE, task.getDueDate());
+        values.put(TASK_PRIORITY, task.getPriority());
+        values.put(TASK_STATUS, task.getStatus());
+        values.put(TASK_SUBJECT_ID, task.getSubjectId());
+        values.put(TASK_USER_ID, task.getUserId());
+
+        int rows = db.update(TABLE_TASKS, values,
+                TASK_ID + " = ?",
+                new String[]{String.valueOf(task.getId())});
+        db.close();
+        return rows > 0;
+    }
+
+    public boolean deleteTask(int taskId, int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rows = db.delete(TABLE_TASKS,
+                TASK_ID + " = ? AND " + TASK_USER_ID + " = ?",
+                new String[]{String.valueOf(taskId), String.valueOf(userId)});
+        db.close();
+        return rows > 0;
+    }
+
+    public boolean deleteTask(int taskId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rows = db.delete(TABLE_TASKS,
+                TASK_ID + " = ?",
+                new String[]{String.valueOf(taskId)});
         db.close();
         return rows > 0;
     }
